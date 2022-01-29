@@ -71,5 +71,5 @@ class CoilConfig:
 
 	def create_coil(self) -> Coil:
 		"""Create a coil from the configuration"""
-		return Coil(coils, inner_diameter, wire_diameter, resistivity)
+		return Coil(self.coils, self.inner_diameter, self.wire_diameter, self.resistivity)
 		

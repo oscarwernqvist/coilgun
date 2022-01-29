@@ -23,7 +23,6 @@ class PowerSourceConfig:
 	"""A class that holds all the configuration for a PowerSource"""
 
 	power_source: str					# The kind of power source, e.g. ConstantCurrent or ConstantVoltage
-	power_source_enum: PowerSourceEnum	# Enum for the power source
 	kwargs: dict						# Other params for this specifc power source
 
 	def __post_init__(self):
@@ -37,9 +36,9 @@ class PowerSourceConfig:
 	def create_power_source(self) -> PowerSource:
 		"""Create a power source from the configuration"""
 		if self.power_source_enum == PowerSourceEnum.ConstantCurrent:
-			return ConstantCurrent(**kwargs)
+			return ConstantCurrent(**self.kwargs)
 		elif self.power_source_enum == PowerSourceEnum.ConstantVoltage:
-			return ConstantVoltage(**kwargs)
+			return ConstantVoltage(**self.kwargs)
 
 
 class ConstantCurrent(PowerSource):
