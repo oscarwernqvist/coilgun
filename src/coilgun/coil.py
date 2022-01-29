@@ -2,8 +2,8 @@ import numpy as np
 
 from dataclasses import dataclass
 from .power_source import PowerSource
-from math_and_physics.constants import mu_0
-from math_and_physics.funcs import sign
+from utils.constants import mu_0
+from utils.math import sign
 
 
 @dataclass
