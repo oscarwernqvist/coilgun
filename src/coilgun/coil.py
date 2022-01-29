@@ -5,14 +5,20 @@ from utils.constants import mu_0
 from utils.math import sign
 
 
-@dataclass
-class Coil():
+class Coil:
 	"""Class representing a single coil in a coilgun"""
 
-	coils: list[int]  	 		# Number of coils for every 'circle'
-	inner_diameter: float 		# Inner diameter of the coil. [mm]
-	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
-	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
+	def __init__(self, coils: list[int], inner_diameter: float, wire_diameter: float, resistivity: float):
+		"""
+		coils: list[int]  	 		# Number of coils for every 'circle'
+		inner_diameter: float 		# Inner diameter of the coil. [mm]
+		wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
+		resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
+		"""
+		self.coils = coils
+		self.inner_diameter = inner_diameter
+		self.wire_diameter = wire_diameter
+		self.resistivity = resistivity
 
 	def resistance(self):
 		"""Calculate the resistance in the coil"""
@@ -52,10 +58,18 @@ class Coil():
 
 			B += sign(dz) * dB 	# Not sure about this sign(dz). It is not how the B field works
 
-			print(B * 2 / mu_0 / I)
-
 		return B
 
 
+@dataclass
+class CoilConfig:
+	"""A class that hold all the configuration for a coil"""
+	coils: list[int]  	 		# Number of coils for every 'circle'
+	inner_diameter: float 		# Inner diameter of the coil. [mm]
+	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
+	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
 
+	def create_coil(self) -> Coil:
+		"""Create a coil from the configuration"""
+		return Coil(coils, inner_diameter, wire_diameter, resistivity)
 		
