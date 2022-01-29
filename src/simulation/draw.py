@@ -15,15 +15,25 @@ def draw_coil(coil: Coil, ax: Axes) -> None:
 			circle_radius = (j + 1/2) * coil.wire_diameter + coil.inner_diameter / 2
 
 			# Draw the current wire
-			draw_wire(circle_radius, coils.wire_diameter / 2, z, ax)
+			draw_wire(circle_radius, coil.wire_diameter / 2, z, ax)
 
 
 def draw_wire(radius: float, wire_radius: float, z: float, ax: Axes) -> None:
 	"""Draw a singel loop of wire on an axes object"""
 	wire_in = plt.Circle((z, radius), wire_radius, color='black', fill=False)
-	marker_in = plt.scatter(z, radius, s=300, color='black', marker='x')
 	wire_out = plt.Circle((z, -radius), wire_radius, color='black', fill=False)
 
 	ax.add_patch(wire_in)
-	ax.add_artist(marker_in)
 	ax.add_patch(wire_out)
+
+	# Add a cross in the wire that is going into the figure
+	ax.plot(
+		[z - np.sqrt(1/2) * wire_radius, z + np.sqrt(1/2) * wire_radius], 
+		[radius + np.sqrt(1/2) * wire_radius, radius - np.sqrt(1/2) * wire_radius], 
+		color='black'
+	)
+	ax.plot(
+		[z + np.sqrt(1/2) * wire_radius, z - np.sqrt(1/2) * wire_radius], 
+		[radius + np.sqrt(1/2) * wire_radius, radius - np.sqrt(1/2) * wire_radius], 
+		color='black'
+	)

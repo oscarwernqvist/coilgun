@@ -1,7 +1,6 @@
 import numpy as np
 
 from dataclasses import dataclass
-from .power_source import PowerSource
 from utils.constants import mu_0
 from utils.math import sign
 
@@ -14,7 +13,6 @@ class Coil():
 	inner_diameter: float 		# Inner diameter of the coil. [mm]
 	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
 	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
-	power_source: PowerSource 	# The power source used by the coil
 
 	def resistance(self):
 		"""Calculate the resistance in the coil"""
@@ -32,11 +30,11 @@ class Coil():
 		# Resistance of wire
 		return self.resistivity * L / A
 
-	def B_field(self, z: float):
-		"""Calculate the B field at a coordinate z on the center axis of the coil. z=0 is the first 'circle'"""
-
-		# Current in the coil
-		I = self.power_source.current(self.resistance())
+	def B_field(self, I: float, z: float):
+		"""
+		Calculate the B field at a coordinate z on the center axis of the coil when a current I 
+		flows through the coil. z=0 is the first 'circle'
+		"""
 
 		# The B field can be calculated using the formula for a current loop
 		B = 0
