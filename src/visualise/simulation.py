@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 from simulation.simulate import CoilgunSimulation
-from visualize.coil import draw_coil
+from visualise.coil import draw_coil
 
 
 def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
-	"""Visualize the simulation"""
+	"""Visualise the simulation"""
 
 	# Run the simulation
 	sim_data = sim.run()

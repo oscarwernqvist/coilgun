@@ -5,8 +5,8 @@ from coilgun.coil import CoilConfig
 from coilgun.power_source import PowerSourceConfig
 from simulation.projectile import ProjectileConf
 from simulation.simulate import CoilgunSimulation, SimulationConf
-from visualize.coil import draw_coil
-from visualize.simulation import draw_simulation
+from visualise.coil import draw_coil
+from visualise.simulation import draw_simulation
 
 
 # TODO: Add command line args for settings
@@ -56,14 +56,14 @@ def show_simulation(args):
 	plt.show()
 
 def main():
-	parser = ArgumentParser(description='Visualize a coilgun using matplotlib')
+	parser = ArgumentParser(description='Visualise a coilgun using matplotlib')
 	subparsers = parser.add_subparsers(help='Differnet visualizations', dest='prog', required=True)
 
-	# Visualize a coil
-	coil_parser = subparsers.add_parser('coil', help='Visualize a coil')
+	# Visualise a coil
+	coil_parser = subparsers.add_parser('coil', help='Visualise a coil')
 
-	# Visualize a simulation
-	sim_parser = subparsers.add_parser('simulation', aliases=['sim'], help='Visualize a simulation of a coilgun')
+	# Visualise a simulation
+	sim_parser = subparsers.add_parser('simulation', aliases=['sim'], help='Visualise a simulation of a coilgun')
 
 	# Parse arguments and execute the right program
 	args = parser.parse_args()
