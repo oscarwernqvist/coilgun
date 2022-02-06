@@ -2,6 +2,12 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
+
+
+class PowerSourceEnum(Enum):
+	ConstantCurrent = "ConstantCurrent"
+	ConstantVoltage = "ConstantVoltage"
 
 
 class PowerSource(ABC):
@@ -13,20 +19,50 @@ class PowerSource(ABC):
 
 
 @dataclass
+class PowerSourceConfig:
+	"""A class that holds all the configuration for a PowerSource"""
+
+	power_source: str					# The kind of power source, e.g. ConstantCurrent or ConstantVoltage
+	kwargs: dict						# Other params for this specifc power source
+
+	def __post_init__(self):
+		"""Assign to power source enum after init"""
+		try:
+			self.power_source_enum = PowerSourceEnum[self.power_source]
+		except IndexError: # This i wrong i think
+			raise ValueError(f"The power source {self.power_source} does not exist.")
+
+
+	def create_power_source(self) -> PowerSource:
+		"""Create a power source from the configuration"""
+		if self.power_source_enum == PowerSourceEnum.ConstantCurrent:
+			return ConstantCurrent(**self.kwargs)
+		elif self.power_source_enum == PowerSourceEnum.ConstantVoltage:
+			return ConstantVoltage(**self.kwargs)
+
+
 class ConstantCurrent(PowerSource):
 	"""Class for generating a constant current"""
 
-	I: float 	# The constant current supplied by the power source. Measured in Ampere
+	def __init__(self, current: float):
+		"""
+		I: float 	# The constant current supplied by the power source. Measured in Ampere
+		"""
+		self.I = current
+
 
 	def current(self, resistance: float) -> float:
 		return self.I
 
 
-@dataclass
 class ConstantVoltage(PowerSource):
 	"""Class for generating a current from a constant voltage"""
 
-	voltage: float 	# The constant voltage over the power source. Measured in Volt
+	def __init__(self, voltage: float):
+		"""
+		voltage: float 	# The constant voltage over the power source. Measured in Volt
+		"""
+		self.voltage = voltage
 
 	def current(self, resistance: float) -> float:
 		return self.voltage / resistance

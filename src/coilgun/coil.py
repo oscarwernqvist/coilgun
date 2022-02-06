@@ -1,20 +1,24 @@
 import numpy as np
 
 from dataclasses import dataclass
-from .power_source import PowerSource
-from math_and_physics.constants import mu_0
-from math_and_physics.funcs import sign
+from utils.constants import mu_0
+from utils.math import sign
 
 
-@dataclass
-class Coil():
+class Coil:
 	"""Class representing a single coil in a coilgun"""
 
-	coils: list[int]  	 		# Number of coils for every 'circle'
-	inner_diameter: float 		# Inner diameter of the coil. [mm]
-	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
-	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
-	power_source: PowerSource 	# The power source used by the coil
+	def __init__(self, coils: list[int], inner_diameter: float, wire_diameter: float, resistivity: float):
+		"""
+		coils: list[int]  	 		# Number of coils for every 'circle'
+		inner_diameter: float 		# Inner diameter of the coil. [mm]
+		wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
+		resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
+		"""
+		self.coils = coils
+		self.inner_diameter = inner_diameter
+		self.wire_diameter = wire_diameter
+		self.resistivity = resistivity
 
 	def resistance(self):
 		"""Calculate the resistance in the coil"""
@@ -32,11 +36,11 @@ class Coil():
 		# Resistance of wire
 		return self.resistivity * L / A
 
-	def B_field(self, z: float):
-		"""Calculate the B field at a coordinate z on the center axis of the coil. z=0 is the first 'circle'"""
-
-		# Current in the coil
-		I = self.power_source.current(self.resistance())
+	def B_field(self, I: float, z: float):
+		"""
+		Calculate the B field at a coordinate z on the center axis of the coil when a current I 
+		flows through the coil. z=0 is the first 'circle'
+		"""
 
 		# The B field can be calculated using the formula for a current loop
 		B = 0
@@ -54,10 +58,18 @@ class Coil():
 
 			B += sign(dz) * dB 	# Not sure about this sign(dz). It is not how the B field works
 
-			print(B * 2 / mu_0 / I)
-
 		return B
 
 
+@dataclass
+class CoilConfig:
+	"""A class that hold all the configuration for a coil"""
+	coils: list[int]  	 		# Number of coils for every 'circle'
+	inner_diameter: float 		# Inner diameter of the coil. [mm]
+	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
+	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
 
+	def create_coil(self) -> Coil:
+		"""Create a coil from the configuration"""
+		return Coil(self.coils, self.inner_diameter, self.wire_diameter, self.resistivity)
 		
