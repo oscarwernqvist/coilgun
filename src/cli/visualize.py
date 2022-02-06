@@ -9,6 +9,9 @@ from visualize.coil import draw_coil
 from visualize.simulation import draw_simulation
 
 
+# TODO: Add command line args for settings
+
+
 def get_coil():
 	"""Get a coil"""
 	return CoilConfig(coils=[1, 2, 3, 4], inner_diameter=10, wire_diameter=1, resistivity=1e-6).create_coil()
@@ -48,7 +51,9 @@ def show_simulation(args):
 
 	sim = CoilgunSimulation(coil, power_source, projectile, conf)
 
-	draw_simulation(sim)
+	animation = draw_simulation(sim)
+	
+	plt.show()
 
 def main():
 	parser = ArgumentParser(description='Visualize a coilgun using matplotlib')

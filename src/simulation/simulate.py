@@ -14,6 +14,24 @@ class SimulationConf:
 	max_time: float 		# The maximum time the simulation will run for
 
 
+@dataclass
+class SimulationData:
+	"""A class that holds all the data from a simulation"""
+
+	time: list[float]		# The time for every frame
+	pos: list[float]		# The position of the projectile at every time
+	vel: list[float]		# The velocity of the projectile at every time
+	energy: list[float]		# The energy consumed by the coil at the time t during the time dt
+
+	def frames(self):
+		"""Return the number of frames in the simulation"""
+		return len(self.time)
+
+	def position_limits(self):
+		"""Return the minimum and maximum position of the projectile"""
+		return min(self.pos), max(self.pos)
+
+
 class CoilgunSimulation:
 	"""A class that performances a simulation of a coilgun"""
 
@@ -32,7 +50,10 @@ class CoilgunSimulation:
 	def run(self):
 		"""Run the simulation"""
 
-		simulation_data = []
+		time = []
+		pos = []
+		vel = []
+		energy = []
 
 		while self.t < self.max_time:
 			I = self.power_source.current(resistance=self.R)
@@ -41,8 +62,10 @@ class CoilgunSimulation:
 			E = I**2 * self.R * self.dt
 
 			# Save the information
-			simulation_data.append((self.t, self.projectile.pos, self.projectile.vel, E))
-
+			time.append(self.t)
+			pos.append(self.projectile.pos)
+			vel.append(self.projectile.vel)
+			energy.append(E)
 
 			# This is wrong but well I must test it
 			B = self.coil.B_field(z=self.projectile.pos, I=I)
@@ -51,6 +74,6 @@ class CoilgunSimulation:
 
 			self.t += self.dt
 
-		return simulation_data
+		return SimulationData(time, pos, vel, energy)
 
 
