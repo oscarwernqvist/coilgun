@@ -1,0 +1,8 @@
+test_param1:
+  min: 1.0
+  max: 1.0
+  rate: 1.0
+test_param2:
+  min: 2.0
+  max: 2.0
+  rate: 2.0
