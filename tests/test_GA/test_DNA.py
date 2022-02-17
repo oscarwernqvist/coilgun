@@ -13,6 +13,15 @@ def test_initialization(DNA_template):
 
 	assert dna.is_initialized()
 
+def test_randomazation(simple_DNA, simple_mutation_rules):
+	"""Test if the DNA can be randomized"""
+	before_randomazation = simple_DNA.DNA['test_param1']
+	# Ransomize
+	simple_DNA.randomize_DNA(rules=simple_mutation_rules)
+
+	# assert the randomazation has changed the value
+	assert not before_randomazation == simple_DNA.DNA['test_param1']
+
 def test_mutation(simple_DNA, simple_mutation_rules):
 	"""Test a muation of the DNA"""
 	before_mutation = simple_DNA.DNA['test_param1']

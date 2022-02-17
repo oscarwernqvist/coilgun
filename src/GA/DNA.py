@@ -96,6 +96,18 @@ class DNA:
 	def __init__(self, DNA: dict=None):
 		self.DNA = DNA
 
+	def randomize_DNA(self, rules: MutationRules):
+		"""Randomize the DNA"""
+		if not self.is_initialized():
+			raise MutationError
+
+		# Only randomize params that can be mutated
+		for param in rules.all_rules():
+			if param not in self.DNA.keys():
+				raise MutationError
+
+			self.DNA[param] = rules.rule(param).mutate()
+
 	def is_initialized(self) -> bool:
 		return self.DNA is not None
 

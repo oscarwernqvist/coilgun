@@ -21,6 +21,14 @@ def simple_DNA():
 	return DNA({'test_param1': 1.0})
 
 @pytest.fixture
+def gen_score():
+	dna_A = DNA({str(i): i + 1 for i in range(100)})
+	dna_B = DNA({str(i): 2*i + 2 for i in range(100)})
+	dna_C = DNA({str(i): 3*i + 3 for i in range(100)})
+
+	return [(dna_A, 1), (dna_B, 0), (dna_C, -1)]
+
+@pytest.fixture
 def DNA_template():
 	return path.test_path() / 'test_GA' / 'templates' / 'test_template_DNA.yaml'
 
