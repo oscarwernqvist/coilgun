@@ -31,6 +31,17 @@ class CrossBreeding(Breeding):
 		return DNA(child)
 
 
+class Recorder:
+	"""Record details about the evolution"""
+
+	def __init__(self, record_func: Callable):
+		self.record_func = record_func
+		self.data = []
+
+	def record(self, *args, **kwargs):
+		self.data.append(self.record_func(*args, **kwargs))
+
+
 class Evolution:
 	"""Hold data the evolution of the DNA"""
 
@@ -55,36 +66,50 @@ class Evolution:
 		self.best_score = -float('inf')
 		self.best_DNA = None
 
+		# Keep track of the current score
+		self.generation_score = None
+
 	def evaluate_gen(self) -> list[tuple[DNA, float]]:
 		"""Evaluate the current generation with the fittness function"""
 		self.current_gen += 1
 
 		# Calculate the fittness for all DNA in the current generation
-		generation_score = [(dna, self.fittness_func(dna)) for dna in self.generation]
+		self.generation_score = [(dna, self.fittness_func(dna)) for dna in self.generation]
 
 		# Get the best score and DNA from this generation
-		gen_best = max(generation_score, key=lambda x: x[1])
+		gen_best = max(self.generation_score, key=lambda x: x[1])
 
 		# Update the best DNA
 		if gen_best[1] > self.best_score:
 			self.best_DNA, self.best_score = gen_best
 
-		return generation_score
+		return self.generation_score
 
 	def next_gen(self) -> list[DNA]:
 		"""Evolve the next generation"""
-		generation_score = self.evaluate_gen()
+		self.evaluate_gen()
 
 		# Breed the next generation
-		return [self.breeding_protocol.breed(generation_score) for _ in range(self.population)]
+		new_gen = [self.breeding_protocol.breed(self.generation_score) for _ in range(self.population)]
 
-	def evolve(self):
+		# Mutate the new generation
+		for dna in new_gen:
+			dna.mutate(rules=self.mutation_rules)
+
+		self.generation = new_gen
+
+		return self.generation
+
+	def evolve(self, recorder: Recorder=None):
 		"""Do the evolution"""
 		while self.current_gen < self.last_gen:
 			new_gen = self.next_gen()
 
-			# Mutate the new generation
-			for dna in new_gen:
-				dna.mutate(rules=self.mutation_rules)
+			if recorder is not None:
+				recorder.record(self)
 
-			self.generation = new_gen
+	def population_score(self):
+		"""Return the average score of the population"""
+		if self.generation_score is None:
+			self.evaluate_gen()
+		return sum([dna_score[1] for dna_score in self.generation_score])
