@@ -18,7 +18,35 @@ pip install -e .
 You are now ready to start using the project. 
 
 ## How to use
-To do
+The intended use case is to use commands from the command line. Right now only one command exists to visualise the coil. You use it like this
+```bash
+# This will show you what a coil would look like
+vis coil
+
+# This will start a simulation and show it to you
+vis sim
+```
 
 ## Developing
 Before you start developing a new feature you should always start a new branch. When your feature is done create some tests for it and make sure they pass before creating a pull request. 
+
+To run the test you do the following
+```bash
+# This will run all tests in the tests folder. Always do this before  a commit
+pytest
+
+# To run a specific file with tests use
+pytest <path to file>
+```
+
+To get an overview of how much of the code that is covered by tests use
+```bash
+# This will print out a report of what percentage of files
+# that are covered by tests
+pytest --cov=src
+
+# To generate a detailed report this command can be used.
+# You can open the report by finding index.html in the folder htmlcov
+# and open it in you webbrowser.
+pytest --cov=src --cov-report html
+```
