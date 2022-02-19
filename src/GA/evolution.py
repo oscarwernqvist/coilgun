@@ -51,13 +51,13 @@ class Evolution:
 		self, 
 		generation: list[DNA], 
 		last_gen: int, 
-		fittness_func: FitnessFunction, 
+		fitness_func: FitnessFunction, 
 		breeding_protocol: Breeding, 
 		mutation_rules: MutationRules
 	):
 		self.generation = generation
 		self.last_gen = last_gen
-		self.fittness_func = fittness_func
+		self.fitness_func = fitness_func
 		self.breeding_protocol = breeding_protocol
 		self.mutation_rules = mutation_rules
 
@@ -72,11 +72,11 @@ class Evolution:
 		self.generation_score = None
 
 	def evaluate_gen(self) -> list[tuple[DNA, float]]:
-		"""Evaluate the current generation with the fittness function"""
+		"""Evaluate the current generation with the fitness function"""
 		self.current_gen += 1
 
-		# Calculate the fittness for all DNA in the current generation
-		self.generation_score = [(dna, self.fittness_func(dna)) for dna in self.generation]
+		# Calculate the fitness for all DNA in the current generation
+		self.generation_score = [(dna, self.fitness_func(dna)) for dna in self.generation]
 
 		# Get the best score and DNA from this generation
 		gen_best = max(self.generation_score, key=lambda x: x[1])

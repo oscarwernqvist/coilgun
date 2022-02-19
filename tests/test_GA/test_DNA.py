@@ -4,12 +4,12 @@ from GA.DNA import MutationError, DNA
 
 
 def test_initialization(DNA_template):
-	"""Test the information of the DNA"""
+	"""Test the initialization of the DNA"""
 	dna = DNA()
 
 	assert not dna.is_initialized()
 
-	dna.read_DNA(DNA_template)
+	dna = DNA.read_DNA(DNA_template)
 
 	assert dna.is_initialized()
 
@@ -45,8 +45,7 @@ def test_mutation_error(simple_DNA, bad_mutation_rules, simple_mutation_rules):
 
 def test_read_DNA(DNA_template):
 	"""Try to read DNA from a template"""
-	dna = DNA()
-	dna.read_DNA(DNA_template)
+	dna = DNA.read_DNA(DNA_template)
 	assert dna.DNA['test_param1'] == 1.0
 	assert dna.DNA['test_param2'] == 2.0
 	assert dna.DNA['test_param3'] == 3.0

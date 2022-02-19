@@ -35,13 +35,17 @@ class MutationRule:
 		"""Convert the rule to a dict"""
 		return {'min': self.min, 'max': self.max, 'rate': self.rate}
 
-	def from_dict(self, rules: dict):
-		"""Read values from a dict"""
-		self.min = rules['min']
-		self.max = rules['max']
-		self.rate = rules['rate']
-
-		return self
+	@classmethod
+	def from_dict(cls, rules: dict) -> 'MutationRule':
+		"""
+		Factory method for creating a rule
+		from a dict
+		"""
+		return cls(
+			min_value=rules['min'], 
+			max_value=rules['max'],
+			rate=rules['rate']
+		)
 
 
 class MutationRules:
@@ -62,15 +66,19 @@ class MutationRules:
 		"""Return a specific rule"""
 		return self.rules[rule_name]
 
-	def read_rules(self, rules_file: Path) -> None:
-		"""Read rules data from a yaml file"""
+	@classmethod
+	def read_rules(cls, rules_file: Path) -> 'MutationRules':
+		"""
+		Factory method for reading rules data from a yaml file
+		and creating an object from them
+		"""
 		with rules_file.open() as yaml_file:
 			rules_dict = yaml.safe_load(yaml_file)
 
 		# Unpack the rules
-		self.rules = {param: MutationRule().from_dict(rule) for param, rule in rules_dict.items()}
+		rules = {param: MutationRule().from_dict(rule) for param, rule in rules_dict.items()}
 
-		return self
+		return cls(rules=rules)
 
 	def save_rules(self, rules_file: Path) -> str:
 		"""Save the rules to a yaml file"""
@@ -130,12 +138,16 @@ class DNA:
 			if rule.is_mutating():
 				self.DNA[param] = rule.mutate()
 
-	def read_DNA(self, dna_file: Path):
-		"""Read DNA data from a yaml file"""
+	@classmethod
+	def read_DNA(cls, dna_file: Path) -> 'DNA':
+		"""
+		Factory method for reading DNA data from a yaml file
+		and creating an object from it
+		"""
 		with dna_file.open() as yaml_file:
-			self.DNA = yaml.safe_load(yaml_file)
+			DNA = yaml.safe_load(yaml_file)
 
-		return self
+		return cls(DNA=DNA)
 
 	def save_DNA(self, dna_file: Path) -> str:
 		"""Save the DNA to a yaml file"""

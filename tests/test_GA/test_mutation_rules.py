@@ -26,7 +26,7 @@ def test_initialization_of_rule(min_value, max_value, rate):
 
 	assert not rule.is_initialized()
 
-	rule.from_dict({'min': 1, 'max': 1, 'rate': 1})
+	rule = MutationRule.from_dict({'min': 1, 'max': 1, 'rate': 1})
 
 	assert rule.is_initialized()
 
@@ -36,14 +36,13 @@ def test_initialization_of_rules(rules_template):
 
 	assert not rule.is_initialized()
 
-	rule.read_rules(rules_template)
+	rule = MutationRules.read_rules(rules_template)
 
 	assert rule.is_initialized()
 
 def test_rule_converstion_2_dict():
 	"""Test the rule conversion to and from a dictionary"""
-	rule = MutationRule()
-	rule.from_dict({'min': 1.0, 'max': 1.0, 'rate': 1.0})
+	rule = MutationRule.from_dict({'min': 1.0, 'max': 1.0, 'rate': 1.0})
 
 	assert rule.min == 1.0
 	assert rule.max == 1.0
@@ -57,10 +56,7 @@ def test_rule_converstion_2_dict():
 
 def test_read_rules(rules_template):
 	"""Try to read DNA from a template"""
-	rules = MutationRules()
-	rules.read_rules(rules_template)
-
-	print(rules.all_rules())
+	rules = MutationRules.read_rules(rules_template)
 
 	rule1 = rules.rule('test_param1')
 	rule2 = rules.rule('test_param2')

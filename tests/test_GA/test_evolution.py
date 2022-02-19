@@ -27,7 +27,7 @@ def test_evolution():
 	"""
 	Test the evolution algorithm with a simple DNA.
 	The DNA only has one gene, one float between 0 and 1,
-	and the fittness function will try to maximize this
+	and the fitness function will try to maximize this
 	"""
 	# Create 1000 DNA:s with one gene score between 0 and 1
 	simple_DNA = [DNA({"score": random()}) for _ in range(100)]
@@ -35,14 +35,14 @@ def test_evolution():
 	mutation_rules = MutationRules({"score": MutationRule(0, 1, 0.01)})
 
 	# Define the score function for this DNA
-	def simple_fittness(dna: DNA) -> float:
+	def simple_fitness(dna: DNA) -> float:
 		return dna.DNA["score"]
 
 	# Create the evolution object
 	evolution = Evolution(
 		generation=simple_DNA, 
 		last_gen=100, 
-		fittness_func=simple_fittness, 
+		fitness_func=simple_fitness, 
 		breeding_protocol=CrossBreeding(parent_selection=versus), 
 		mutation_rules=mutation_rules
 	)

@@ -1,44 +1,14 @@
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
-from pathlib import Path
 
-from GA.fitness import coil_from_DNA, power_source_from_DNA, projectile_from_DNA
-from GA.DNA import DNA
-from simulation.simulate import CoilgunSimulation, SimulationConf
 from visualise.coil import draw_coil
 from visualise.simulation import draw_simulation
+from simulation.simulate import CoilgunSimulation
 from utils.path import defaults_path
+from .load_objects import get_coil, get_power_source, get_projectile, get_simulation_conf
 
 
 # TODO: Add command line args for settings
-
-def read_DNA_from_template(template):
-	"""Read DNA from a template file"""
-	dna = DNA()
-	dna.read_DNA(Path(template))
-	return dna
-
-def get_coil(args):
-	"""Get a coil from a template file"""
-	coil_dna = read_DNA_from_template(args.coil)
-	return coil_from_DNA(coil_dna)
-	# return CoilConfig(coils=[1, 2, 3, 4], inner_diameter=10, wire_diameter=1, resistivity=1e-6).create_coil()
-
-def get_power_source(args):
-	"""Get a power source from a template file"""
-	power_dna = read_DNA_from_template(args.power_source)
-	return power_source_from_DNA(power_dna)
-	# return PowerSourceConfig(power_source="ConstantCurrent", kwargs={'current': 1}).create_power_source()
-
-def get_projectile(args):
-	"""Get a projectile from a template file"""
-	projectile_dna = read_DNA_from_template(args.projectile)
-	return projectile_from_DNA(projectile_dna)
-	# return ProjectileConf(mass=1, start_pos=-1, start_vel=1).create_projectile()
-
-def get_simulation_conf(args):
-	"""Get a power source"""
-	return SimulationConf(dt=1, max_time=10)
 
 def show_coil(args):
 	"""Command line interface for showing a coil"""
