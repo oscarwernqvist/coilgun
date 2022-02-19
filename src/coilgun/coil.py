@@ -1,12 +1,37 @@
 import numpy as np
 
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
+
 from utils.constants import mu_0
 from utils.math import sign
+from enum import Enum
 
 
-class Coil:
-	"""Class representing a single coil in a coilgun"""
+class CoilEnum(Enum):
+	GeometryCoil = "GeometryCoil"
+
+
+class Coil(ABC):
+	"""Base class for a coil"""
+
+	@abstractmethod
+	def resistance(self) -> float:
+		"""Calculate the resistance in the coil"""
+
+	@abstractmethod
+	def B_field(self, I: float, z: float):
+		"""
+		Calculate the B field at a coordinate z on the center axis of the coil when a current I 
+		flows through the coil. z=0 is the first part of the coil
+		"""
+
+
+class GeometryCoil(Coil):
+	"""
+	This coil is based of multiple circles of wire.
+	It can have a different number of circles at different
+	places so it can have a costumized geometry.
+	"""
 
 	def __init__(self, coils: list[int], inner_diameter: float, wire_diameter: float, resistivity: float):
 		"""
@@ -59,17 +84,3 @@ class Coil:
 			B += sign(dz) * dB 	# Not sure about this sign(dz). It is not how the B field works
 
 		return B
-
-
-@dataclass
-class CoilConfig:
-	"""A class that hold all the configuration for a coil"""
-	coils: list[int]  	 		# Number of coils for every 'circle'
-	inner_diameter: float 		# Inner diameter of the coil. [mm]
-	wire_diameter: float 		# Diameter of the wire used in the coil. [mm]
-	resistivity: float 			# Resistivity of the material used in the wire [Ohm x mm]
-
-	def create_coil(self) -> Coil:
-		"""Create a coil from the configuration"""
-		return Coil(self.coils, self.inner_diameter, self.wire_diameter, self.resistivity)
-		

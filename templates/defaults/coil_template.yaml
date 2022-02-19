@@ -1,0 +1,9 @@
+CoilType: GeometryCoil
+coils:
+  - 1
+  - 2
+  - 3
+  - 4
+inner_diameter: 10
+wire_diameter: 1
+resistivity: 1.e-6

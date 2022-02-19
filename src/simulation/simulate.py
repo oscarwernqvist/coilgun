@@ -31,6 +31,16 @@ class SimulationData:
 		"""Return the minimum and maximum position of the projectile"""
 		return min(self.pos), max(self.pos)
 
+	def energy_consumption(self) -> float:
+		"""Return the total energy consumed"""
+		return sum(self.energy)
+
+	def energy_gain(self, projectile_mass: float) -> float:
+		"""Return the energy gained by the projectile"""
+		start_energy = projectile_mass*self.vel[0]**2/2
+		end_energy = projectile_mass*self.vel[-1]**2/2
+		return end_energy - start_energy
+
 
 class CoilgunSimulation:
 	"""A class that performances a simulation of a coilgun"""

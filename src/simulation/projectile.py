@@ -1,5 +1,8 @@
-import numpy as np
-from dataclasses import dataclass
+from enum import Enum
+
+
+class ProjectileEnum(Enum):
+	Projectile1D = "Projectile1D"
 
 
 class Projectile1D:
@@ -21,17 +24,3 @@ class Projectile1D:
 		self.pos += self.vel * dt
 		self.vel += self.acc * dt
 		self.acc = 0
-
-
-@dataclass
-class ProjectileConf:
-	"""A class that hold the configuration for a projectile"""
-
-	mass: float 		# The mass of the projectile
-	start_pos: float 	# The start postion for the projectile
-	start_vel: float 	# The start velocity for the projectile
-
-
-	def create_projectile(self) -> Projectile1D:
-		"""Create a projectile from the configuration"""
-		return Projectile1D(mass=self.mass, pos=self.start_pos, vel=self.start_vel)

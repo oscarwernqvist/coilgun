@@ -96,6 +96,10 @@ class DNA:
 	def __init__(self, DNA: dict=None):
 		self.DNA = DNA
 
+	def __getitem__(self, key):
+		"""Alows for use of [] on the DNA object"""
+		return self.DNA[key]
+
 	def randomize_DNA(self, rules: MutationRules):
 		"""Randomize the DNA"""
 		if not self.is_initialized():

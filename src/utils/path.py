@@ -14,3 +14,6 @@ def src_path():
 
 def test_path():
 	return project_path() / 'tests'
+
+def defaults_path():
+	return project_path() / 'templates' / 'defaults'

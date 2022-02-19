@@ -1,6 +1,6 @@
 import pytest
 
-from coilgun.coil import Coil
+from coilgun.coil import GeometryCoil
 from coilgun.power_source import ConstantCurrent, ConstantVoltage
 
 
@@ -13,8 +13,8 @@ def constant_voltage_source():
 	return ConstantVoltage(voltage=30)
 
 @pytest.fixture
-def test_coil():
-	return Coil(
+def geometry_coil():
+	return GeometryCoil(
 		coils=[1,2,4],
 		inner_diameter=5,
 		wire_diameter=1,

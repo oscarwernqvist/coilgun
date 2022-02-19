@@ -1,0 +1,4 @@
+ProjectileType: Projectile1D
+projectile_mass: 1
+projectile_position: -1
+projectile_velocity: 1

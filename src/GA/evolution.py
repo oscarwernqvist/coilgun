@@ -1,8 +1,10 @@
-from .DNA import DNA, MutationRules
-
 from typing import Callable
 from abc import ABC, abstractmethod
 from random import random
+
+from .DNA import DNA, MutationRules
+from .fitness import FitnessFunction
+
 
 
 class Breeding:
@@ -49,7 +51,7 @@ class Evolution:
 		self, 
 		generation: list[DNA], 
 		last_gen: int, 
-		fittness_func: Callable, 
+		fittness_func: FitnessFunction, 
 		breeding_protocol: Breeding, 
 		mutation_rules: MutationRules
 	):
