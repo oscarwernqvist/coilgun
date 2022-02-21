@@ -54,7 +54,7 @@ def main():
 	)
 	coil_parser.add_argument(
 		'-c', '--coil', 
-		default=f"{defaults_path() / 'coil_template.yaml'}",
+		default=f"{defaults_path() / 'dna_template.yaml'}",
 		type=str,
 		help="Template file for the coil. If not provided a default is used"
 	)
@@ -67,19 +67,19 @@ def main():
 	)
 	sim_parser.add_argument(
 		'-c', '--coil', 
-		default=f"{defaults_path() / 'coil_template.yaml'}",
+		default=f"{defaults_path() / 'dna_template.yaml'}",
 		type=str,
 		help="Template file for the coil. If not provided a default is used"
 	)
 	sim_parser.add_argument(
 		'-s', '--power-source', 
-		default=f"{defaults_path() / 'power_template.yaml'}",
+		default=f"{defaults_path() / 'dna_template.yaml'}",
 		type=str,
 		help="Template file for the power source. If not provided a default is used"
 	)
 	sim_parser.add_argument(
 		'-p', '--projectile', 
-		default=f"{defaults_path() / 'projectile_template.yaml'}",
+		default=f"{defaults_path() / 'dna_template.yaml'}",
 		type=str,
 		help="Template file for the projectile. If not provided a default is used"
 	)

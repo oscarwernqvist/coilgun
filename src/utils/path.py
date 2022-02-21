@@ -17,3 +17,6 @@ def test_path():
 
 def defaults_path():
 	return project_path() / 'templates' / 'defaults'
+
+def data_path():
+	return project_path() / 'data'

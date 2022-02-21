@@ -1,6 +1,10 @@
 import pytest
 
+from random import random
+
 from GA.DNA import DNA, MutationRule, MutationRules
+from GA.evolution import CrossBreeding, Evolution
+from GA.selection import versus
 from utils import path
 
 
@@ -35,3 +39,28 @@ def DNA_template():
 @pytest.fixture
 def rules_template():
 	return path.test_path() / 'test_GA' / 'templates' / 'test_template_rules.yaml'
+
+@pytest.fixture
+def breeding_vs():
+	return CrossBreeding(parent_selection=versus)
+
+@pytest.fixture
+def test_evolution(breeding_vs):
+	# Create 1000 DNA:s with one gene score between 0 and 1
+	simple_DNA = [DNA({"score": random()}) for _ in range(100)]
+	# Define the mutation rules
+	mutation_rules = MutationRules({"score": MutationRule(0, 1, 0.01)})
+
+	# Define the score function for this DNA
+	def simple_fitness(dna: DNA) -> float:
+		return dna.DNA["score"]
+
+	# Create the evolution object
+	evolution = Evolution(
+		generation=simple_DNA, 
+		last_gen=100, 
+		fitness_func=simple_fitness, 
+		breeding_protocol=breeding_vs, 
+		mutation_rules=mutation_rules
+	)
+	return evolution

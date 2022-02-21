@@ -1,9 +1,14 @@
+import os
+import math
+
 from typing import Callable
 from abc import ABC, abstractmethod
 from random import random
+from pathlib import Path
 
 from .DNA import DNA, MutationRules
 from .fitness import FitnessFunction
+from .recorder import Recorder
 
 
 
@@ -31,17 +36,6 @@ class CrossBreeding(Breeding):
 			child[param] = parent_A[param] if random() < 0.5 else parent_B[param]
 
 		return DNA(child)
-
-
-class Recorder:
-	"""Record details about the evolution"""
-
-	def __init__(self, record_func: Callable):
-		self.record_func = record_func
-		self.data = []
-
-	def record(self, *args, **kwargs):
-		self.data.append(self.record_func(*args, **kwargs))
 
 
 class Evolution:
@@ -104,14 +98,57 @@ class Evolution:
 
 	def evolve(self, recorder: Recorder=None):
 		"""Do the evolution"""
+		if recorder is not None:
+			recorder.setup(self)
+
 		while self.current_gen < self.last_gen:
 			new_gen = self.next_gen()
 
 			if recorder is not None:
 				recorder.record(self)
 
+		if recorder is not None:
+			recorder.summary(self)
+
 	def population_score(self):
 		"""Return the average score of the population"""
 		if self.generation_score is None:
 			self.evaluate_gen()
 		return sum([dna_score[1] for dna_score in self.generation_score])
+
+	def save_checkpoint(self, output_path: Path):
+		"""
+		Save a checkpoint of the evolution that can
+		later be resumed
+		"""
+		
+		# Create the checkpoint folder
+		padding = math.ceil(math.log10(self.last_gen))
+		checkpoint = "gen_" + str(self.current_gen).zfill(padding)
+
+		checkpoint_dir = output_path / checkpoint
+		os.makedirs(checkpoint_dir)
+
+		# Save every DNA into the checkpoint folder
+		padding = math.ceil(math.log10(self.population))
+		for i, dna in enumerate(self.generation):
+			file_name = "DNA_" + str(i).zfill(padding) + ".yaml"
+			dna.save_DNA(checkpoint_dir / file_name)
+
+		# Return the checkpoint folder
+		return checkpoint_dir
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
