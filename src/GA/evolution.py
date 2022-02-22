@@ -110,11 +110,11 @@ class Evolution:
 		if recorder is not None:
 			recorder.summary(self)
 
-	def population_score(self):
+	def average_score(self):
 		"""Return the average score of the population"""
 		if self.generation_score is None:
 			self.evaluate_gen()
-		return sum([dna_score[1] for dna_score in self.generation_score])
+		return sum([dna_score[1] for dna_score in self.generation_score]) / self.population
 
 	def save_checkpoint(self, output_path: Path):
 		"""

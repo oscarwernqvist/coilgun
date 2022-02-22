@@ -49,7 +49,7 @@ class FitnessRecorder(Recorder):
 		pass
 
 	def record(self, evolution):
-		average_score = evolution.population_score()
+		average_score = evolution.average_score()
 		best_score = evolution.best_score
 		self.data.append((average_score, best_score))
 

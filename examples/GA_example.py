@@ -8,7 +8,8 @@ that only has one trait, a single float between
 """
 
 from GA.DNA import DNA, MutationRules, MutationRule
-from GA.evolution import Evolution, CrossBreeding, Recorder
+from GA.evolution import Evolution, CrossBreeding
+from GA.recorder import FitnessRecorder
 from GA.selection import versus
 from matplotlib import pyplot as plt
 import random
@@ -30,24 +31,20 @@ def main():
 	)
 
 	# Define the score function for this DNA
-	def simple_fittness(dna: DNA) -> float:
+	def simple_fitness(dna: DNA) -> float:
 		return dna.DNA["score"]
 
 	# Create the evolution object
 	evolution = Evolution(
 		generation=pop, 
 		last_gen=10, 
-		fittness_func=simple_fittness, 
+		fitness_func=simple_fitness, 
 		breeding_protocol=CrossBreeding(parent_selection=versus), 
 		mutation_rules=mutation_rules
 	)
 
-	def record_func(evolution_object, *args, **kwargs):
-		"""This function will be called every iteration of the evolution"""
-		return evolution_object.population_score()
-
 	# Create a Recorder object to record information about the evoulution
-	recorder = Recorder(record_func)
+	recorder = FitnessRecorder()
 
 	# Start the evolution
 	evolution.evolve(recorder=recorder)
