@@ -1,17 +1,15 @@
-CoilType: GeometryCoil
-coils:
-  - 1
-  - 2
-  - 3
-  - 4
-inner_diameter: 10
-wire_diameter: 1
-resistivity: 1.0e-6
+CoilType: Solenoid
+coil_lenght: 0.1
+number_of_turns: 1000
+inner_diameter: 0.1
+wire_diameter: 1.0e-3
+resistivity: 1.0e-9
 
 PowerType: ConstantCurrent
 current: 1
 
-ProjectileType: Projectile1D
-projectile_mass: 1
-projectile_position: -1
-projectile_velocity: 1
+ProjectileType: MagneticProjectile
+projectile_mass: 0.01
+projectile_position: -0.1
+projectile_velocity: 0
+magnetic_dipole_momnet: 1

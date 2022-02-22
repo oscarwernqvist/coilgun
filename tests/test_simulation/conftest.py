@@ -1,7 +1,7 @@
 import pytest
 
 from simulation.simulate import CoilgunSimulation, SimulationConf
-from simulation.projectile import Projectile1D
+from coilgun.projectile import MagneticProjectile
 
 
 @pytest.fixture
@@ -9,11 +9,11 @@ def test_simulation_config():
 	return SimulationConf(dt=1, max_time=10)
 
 @pytest.fixture
-def test_projectile():
-	return Projectile1D(mass=1, pos=-1, vel=1)
+def magnetic_projectile():
+	return MagneticProjectile(mass=1, pos=-1, vel=1, m=1)
 
 @pytest.fixture
-def test_simulation(geometry_coil, constant_current_source, test_projectile, test_simulation_config):
+def test_simulation(solenoid, constant_current_source, magnetic_projectile, test_simulation_config):
 	return CoilgunSimulation(
-		geometry_coil, constant_current_source, test_projectile, test_simulation_config
+		solenoid, constant_current_source, magnetic_projectile, test_simulation_config
 	)

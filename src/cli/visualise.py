@@ -5,10 +5,8 @@ from visualise.coil import draw_coil
 from visualise.simulation import draw_simulation
 from simulation.simulate import CoilgunSimulation
 from utils.path import defaults_path
-from .load_objects import get_coil, get_power_source, get_projectile, get_simulation_conf
+from .load_objects import get_coil, get_power_source, get_projectile, get_simulation_conf, parse_args
 
-
-# TODO: Add command line args for settings
 
 def show_coil(args):
 	"""Command line interface for showing a coil"""
@@ -41,6 +39,12 @@ def main():
 	parser = ArgumentParser(
 		description='Visualise a coilgun using matplotlib'
 	)
+	parser.add_argument(
+		"--conf",
+		default=f"{defaults_path() / 'conf_template.yaml'}",
+		type=str,
+		help="Provide a configuration file for all the settings")
+
 	subparsers = parser.add_subparsers(
 		help='Differnet visualizations', 
 		dest='prog', 
@@ -53,8 +57,7 @@ def main():
 		help='Visualise a coil'
 	)
 	coil_parser.add_argument(
-		'-c', '--coil', 
-		default=f"{defaults_path() / 'dna_template.yaml'}",
+		'-c', '--coil',
 		type=str,
 		help="Template file for the coil. If not provided a default is used"
 	)
@@ -66,30 +69,27 @@ def main():
 		help='Visualise a simulation of a coilgun'
 	)
 	sim_parser.add_argument(
-		'-c', '--coil', 
-		default=f"{defaults_path() / 'dna_template.yaml'}",
+		'-c', '--coil',
 		type=str,
 		help="Template file for the coil. If not provided a default is used"
 	)
 	sim_parser.add_argument(
-		'-s', '--power-source', 
-		default=f"{defaults_path() / 'dna_template.yaml'}",
+		'-s', '--power-source',
 		type=str,
 		help="Template file for the power source. If not provided a default is used"
 	)
 	sim_parser.add_argument(
-		'-p', '--projectile', 
-		default=f"{defaults_path() / 'dna_template.yaml'}",
+		'-p', '--projectile',
 		type=str,
 		help="Template file for the projectile. If not provided a default is used"
 	)
 
 	# Parse arguments and execute the right program
-	args = parser.parse_args()
+	args = parse_args(parser.parse_args())
 
-	if args.prog == 'coil':
+	if args["prog"] == 'coil':
 		show_coil(args)
-	elif args.prog in ['simulation', 'sim']:
+	elif args["prog"] in ['simulation', 'sim']:
 		show_simulation(args)
 
 

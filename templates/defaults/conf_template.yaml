@@ -1,1 +1,14 @@
-# TODO
+# Paths to other confs
+coil: templates/defaults/dna_template.yaml
+power_source: templates/defaults/dna_template.yaml
+projectile: templates/defaults/dna_template.yaml
+DNA: templates/defaults/dna_template.yaml
+rules: templates/defaults/rules_template.yaml
+
+# Genetic algorithm conf
+population_size: 100
+generations: 100
+
+# Simulation conf
+dt: 0.005
+max_time: 1

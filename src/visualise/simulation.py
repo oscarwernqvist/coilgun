@@ -19,7 +19,10 @@ def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
 
 	def init_animation():
 		# Init the animation
-		ax.set_xlim(*sim_data.position_limits())
+		min_pos, max_pos = sim_data.position_limits()
+		min_x = min(min_pos, 0)
+		max_x = max(max_pos, sim.coil.length())
+		ax.set_xlim([min_x, max_x])
 		ax.set_aspect('equal')
 
 		# Draw the coil onto the figure
@@ -33,7 +36,14 @@ def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
 		projectile.set_offsets([pos,0])
 		return (projectile,)
 
-	animation = FuncAnimation(fig, update_animation, frames=range(sim_data.frames()), init_func=init_animation, blit=True)
+	animation = FuncAnimation(
+		fig, 
+		update_animation, 
+		frames=range(sim_data.frames()), 
+		init_func=init_animation,
+		interval=int(1000 * sim_data.total_time() / sim_data.frames()),
+		blit=True
+	)
 
 	return animation
 

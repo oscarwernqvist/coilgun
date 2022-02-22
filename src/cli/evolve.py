@@ -8,7 +8,7 @@ from GA.DNA import DNA, MutationRules
 from GA.fitness import CoilFitness
 from GA.selection import versus
 from utils.path import defaults_path, data_path
-from .load_objects import read_DNA_from_template, get_simulation_conf
+from .load_objects import read_DNA_from_template, get_simulation_conf, parse_args
 
 
 # TODO: Add command line args for settings
@@ -21,24 +21,20 @@ def main():
 	parser.add_argument(
 		'-g', '--generations', 
 		type=int,
-		default=10,
 		help="Number of generations to run the simulation for"
 	)
 	parser.add_argument(
 		'-p', '--population-size',
 		type=int,
-		default=10,
 		help="Size of the population"
 	)
 	parser.add_argument(
-		'-d', '--base-dna', 
-		default=f"{defaults_path() / 'dna_template.yaml'}",
+		'-d', '--DNA',
 		type=str,
 		help="Template file for the base DNA. If not provided a default is used"
 	)
 	parser.add_argument(
 		'-r', '--rules',
-		default=f"{defaults_path() / 'rules_template.yaml'}",
 		type=str,
 		help="Template file for the base DNA. If not provided a default is used"
 	)
@@ -50,11 +46,11 @@ def main():
 	)
 
 	# Parse arguments and execute the program
-	args = parser.parse_args()
+	args = parse_args(parser.parse_args())
 
 	# Setup evoultion object
-	first_generation = [read_DNA_from_template(args.base_dna) for _ in range(args.population_size)]
-	mutation_rules = MutationRules.read_rules(Path(args.rules))
+	first_generation = [read_DNA_from_template(args["DNA"]) for _ in range(args["population_size"])]
+	mutation_rules = MutationRules.read_rules(Path(args["rules"]))
 	simulation_conf = get_simulation_conf(args)
 
 	for dna in first_generation:
@@ -65,7 +61,7 @@ def main():
 
 	evolution = Evolution(
 		generation=first_generation,
-		last_gen=args.generations,
+		last_gen=args["generations"],
 		fitness_func=fitness_func,
 		breeding_protocol=breeding_protocol,
 		mutation_rules=mutation_rules

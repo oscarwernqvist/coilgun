@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Callable
 
 from .DNA import DNA
-from coilgun.coil import Coil, CoilEnum, GeometryCoil
+from coilgun.coil import Coil, CoilEnum, GeometryCoil, Solenoid
 from coilgun.power_source import ConstantCurrent, ConstantVoltage, PowerSource, PowerSourceEnum
-from simulation.projectile import Projectile1D, ProjectileEnum
+from coilgun.projectile import Projectile1D, MagneticProjectile, FerromageneticProjectile, ProjectileEnum
 from simulation.simulate import CoilgunSimulation, SimulationConf
 
 def coil_from_DNA(dna: DNA) -> Coil:
@@ -14,6 +14,14 @@ def coil_from_DNA(dna: DNA) -> Coil:
 	if coil_enum == CoilEnum.GeometryCoil:
 		return GeometryCoil(
 			coils=dna["coils"],
+			inner_diameter=dna["inner_diameter"],
+			wire_diameter=dna["wire_diameter"],
+			resistivity=dna["resistivity"]
+		)
+	elif coil_enum == CoilEnum.Solenoid:
+		return Solenoid(
+			L=dna["coil_lenght"],
+			N=dna["number_of_turns"],
 			inner_diameter=dna["inner_diameter"],
 			wire_diameter=dna["wire_diameter"],
 			resistivity=dna["resistivity"]
@@ -45,6 +53,20 @@ def projectile_from_DNA(dna: DNA) -> Projectile1D:
 			mass=dna["projectile_mass"],
 			pos=dna["projectile_position"],
 			vel=dna["projectile_velocity"]
+		)
+	elif projectile_enum == ProjectileEnum.MagneticProjectile:
+		return MagneticProjectile(
+			mass=dna["projectile_mass"],
+			pos=dna["projectile_position"],
+			vel=dna["projectile_velocity"],
+			m=dna["magnetic_dipole_momnet"]
+		)
+	elif projectile_enum == ProjectileEnum.FerromageneticProjectile:
+		return FerromageneticProjectile(
+			mass=dna["projectile_mass"],
+			pos=dna["projectile_position"],
+			vel=dna["projectile_velocity"],
+			mu=dna["???"]
 		)
 	else:
 		raise NoDNAError(f"{dna['ProjectileType']} is not an implemented projectile.")
@@ -89,6 +111,6 @@ class CoilFitness(FitnessFunction):
 		return n
 
 
-def NoDNAError(Exception):
+class NoDNAError(Exception):
 	"""Raise when there is no mathing DNA"""
 	pass

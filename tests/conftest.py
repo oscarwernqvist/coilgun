@@ -1,6 +1,6 @@
 import pytest
 
-from coilgun.coil import GeometryCoil
+from coilgun.coil import GeometryCoil, Solenoid
 from coilgun.power_source import ConstantCurrent, ConstantVoltage
 
 
@@ -19,4 +19,14 @@ def geometry_coil():
 		inner_diameter=5,
 		wire_diameter=1,
 		resistivity=1e-6
+	)
+
+@pytest.fixture
+def solenoid():
+	return Solenoid(
+		L=0.1,
+		N=100,
+		inner_diameter=0.1,
+		wire_diameter=1e-3,
+		resistivity=1e-9
 	)

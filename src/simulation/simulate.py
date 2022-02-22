@@ -3,7 +3,7 @@ import numpy as np
 from dataclasses import dataclass
 from coilgun.coil import Coil
 from coilgun.power_source import PowerSource
-from .projectile import Projectile1D
+from coilgun.projectile import Projectile1D
 
 
 @dataclass
@@ -41,11 +41,21 @@ class SimulationData:
 		end_energy = projectile_mass*self.vel[-1]**2/2
 		return end_energy - start_energy
 
+	def total_time(self):
+		"""Return the total time the simulation was running"""
+		return self.time[-1] - self.time[0]
+
 
 class CoilgunSimulation:
 	"""A class that performances a simulation of a coilgun"""
 
-	def __init__(self, coil: Coil, power_source: PowerSource, projectile: Projectile1D, conf: SimulationConf):
+	def __init__(
+		self, 
+		coil: Coil, 
+		power_source: PowerSource, 
+		projectile: Projectile1D, 
+		conf: SimulationConf
+	):
 		self.coil = coil
 		self.power_source = power_source
 		self.projectile = projectile
@@ -60,29 +70,37 @@ class CoilgunSimulation:
 	def run(self):
 		"""Run the simulation"""
 
-		time = []
-		pos = []
-		vel = []
-		energy = []
+		# Initial conditions
+		time = [self.t]
+		pos = [self.projectile.pos]
+		vel = [self.projectile.vel]
+		energy = [0]
 
 		while self.t < self.max_time:
-			I = self.power_source.current(resistance=self.R)
+			# Calculate the force on the projectile
+			# and update its motion
+			F = self.projectile.calc_force_from_coil(
+				coil=self.coil, 
+				power_source=self.power_source,
+				t=self.t
+			)
+			self.projectile.add_force(F)
+			self.projectile.update(self.dt)
 
-			# Calculate energy
-			E = I**2 * self.R * self.dt
+			# Calculate energy consumption
+			E = self.power_source.energy_consumption(
+				coil=self.coil,
+				t=self.t,
+				dt=self.dt
+			)
+
+			self.t += self.dt
 
 			# Save the information
 			time.append(self.t)
 			pos.append(self.projectile.pos)
 			vel.append(self.projectile.vel)
 			energy.append(E)
-
-			# This is wrong but well I must test it
-			B = self.coil.B_field(z=self.projectile.pos, I=I)
-			self.projectile.add_force(force=B)
-			self.projectile.update(dt=self.dt)
-
-			self.t += self.dt
 
 		return SimulationData(time, pos, vel, energy)
 

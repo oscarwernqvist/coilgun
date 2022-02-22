@@ -1,15 +1,22 @@
+import math
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from coilgun.coil import Coil
+from coilgun.coil import Coil, Solenoid, GeometryCoil
 
 
 def draw_coil(coil: Coil, ax: Axes) -> None:
 	"""A function that will draw the Coil on a axes object"""
+
+	if isinstance(coil, Solenoid):
+		coils = [1 for _ in range(math.floor(coil.L / coil.wire_diameter))]
+	else:
+		coils = coil.coils
 	
 	# Iterate over and draw all the wires
-	for i, circles in enumerate(coil.coils):
+	for i, circles in enumerate(coils):
 		z = i * coil.wire_diameter
 		for j in range(circles):
 			circle_radius = (j + 1/2) * coil.wire_diameter + coil.inner_diameter / 2
