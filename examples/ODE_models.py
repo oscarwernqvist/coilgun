@@ -2,20 +2,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ode_models.coilgun import ode_solver_coilgun
-from ode_models.inductance_models import exponential_model_of_coil_indunctance, exponential_model_of_coil_indunctance_derivative
+from ode_models.inductance_models import (
+	exponential_model_of_coil_indunctance, 
+	exponential_model_of_coil_indunctance_derivative,
+	parmas_for_exponential_model
+)
 
 
-L = exponential_model_of_coil_indunctance(A=156e-6, B=0.004*10**(3*2.06), C=0, D=2.06, E=131.7e-6)
-dLdx = exponential_model_of_coil_indunctance_derivative(A=156e-6, B=0.004*10**(3*2.06), C=0, D=2.06)
+# Parmas
+mu_r = 5
+N = 500
+r = 10e-3
+l = 50e-3
+
+A, B, C, D, E = parmas_for_exponential_model(mu_r, N, r, l)
+
+print(f"{A=}, {B=}, {C=}, {D=} and {E=}")
+
+L = exponential_model_of_coil_indunctance(A, B, C, D, E)
+dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
 
 C = 1600e-6
 R = 0.4
 m = 8e-3
 
 V0 = 300
-x0 = -10e-3
-
-y0 = [x0, 0.0, 0.0, V0/L(x0)]
+x0 = -50e-3
 
 t, x, v, I, V = ode_solver_coilgun(
 	C=C,
@@ -23,20 +35,22 @@ t, x, v, I, V = ode_solver_coilgun(
 	m=m,
 	L=L,
 	dLdx=dLdx,
-	y0=y0,
-	t_span=[0, 0.01]
+	x0=x0,
+	t_max=0.003,
+	V0=V0,
+	v0=0.0
 )
 
-fig, ((pos, vel), (volt, current)) = plt.subplots(2,2)
+fig, ((pos_ax, vel_ax), (volt_ax, current_ax)) = plt.subplots(2,2)
 
-pos.plot(t, x*1e3)
-pos.set(ylabel="Position [mm]")
-vel.plot(t, v)
-vel.set(ylabel="Hastighet [m/s]")
-volt.plot(t, V)
-volt.set(ylabel="Voltage i Kapacitansbank [V]")
-current.plot(t, I)
-current.set(ylabel="Ström genom spolen [A]")
+pos_ax.plot(t, x*1e3)
+pos_ax.set(ylabel="Position [mm]")
+vel_ax.plot(t, v)
+vel_ax.set(ylabel="Hastighet [m/s]")
+volt_ax.plot(t, V)
+volt_ax.set(ylabel="Voltage i Kapacitansbank [V]")
+current_ax.plot(t, I)
+current_ax.set(ylabel="Ström genom spolen [A]")
 
 # x = np.linspace(-30, 60)*1e-3
 
@@ -46,9 +60,7 @@ current.set(ylabel="Ström genom spolen [A]")
 
 plt.show()
 
-# L = exponential_model_of_coil_indunctance(A=156, B=0.004, C=30.0, D=2.06, E=131.7)
-# dLdx = exponential_model_of_coil_indunctance_derivative(A=156, B=0.004, C=30.0, D=2.06)
-# x = np.linspace(0, 90)
+# x = np.linspace(-2*l, 2*l)
 
 # plt.plot(x, L(x))
 # plt.show()
