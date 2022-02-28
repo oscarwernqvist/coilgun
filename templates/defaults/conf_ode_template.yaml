@@ -1,0 +1,11 @@
+# Paths to other confs
+DNA: templates/defaults/dna_ode_template.yaml
+rules: templates/defaults/rules_ode_template.yaml
+
+# Genetic algorithm conf
+population_size: 100
+generations: 10
+
+# Simulation conf
+max_time: 100.0e-3
+minimum_solver_steps: 1000

@@ -38,7 +38,9 @@ t, x, v, I, V = ode_solver_coilgun(
 	x0=x0,
 	t_max=0.003,
 	V0=V0,
-	v0=0.0
+	v0=0.0,
+	x1=20e-3,
+	t_steps=100
 )
 
 fig, ((pos_ax, vel_ax), (volt_ax, current_ax)) = plt.subplots(2,2)

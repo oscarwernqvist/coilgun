@@ -4,6 +4,16 @@ from matplotlib.animation import FuncAnimation
 from simulation.simulate import CoilgunSimulation
 from visualise.coil import draw_coil
 
+from GA.DNA import DNA
+
+from ode_models.coilgun import ode_solver_coilgun, calculate_efficiency
+from ode_models.inductance_models import (
+	exponential_model_of_coil_indunctance, 
+	exponential_model_of_coil_indunctance_derivative,
+	parmas_for_exponential_model,
+	solenoid_resistance
+)
+
 
 def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
 	"""Visualise the simulation"""
@@ -47,3 +57,58 @@ def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
 
 	return animation
 
+def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
+	A, B, C, D, E = parmas_for_exponential_model(
+		mu_r=dna["projectile_mu_r"],
+		N=dna["solenoid_turns"],
+		r=dna["solenoid_radius"],
+		l=dna["solenoid_length"]
+	)
+
+	L = exponential_model_of_coil_indunctance(A, B, C, D, E)
+	dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
+	R = solenoid_resistance(
+		N=dna["solenoid_turns"],
+		r=dna["solenoid_radius"]
+	)
+
+	t, x, v, I, V = ode_solver_coilgun(
+		C=dna["capacitance"],
+		R=R,
+		m=dna["projectile_mass"],
+		L=L,
+		dLdx=dLdx,
+		x0=dna["projectile_start_pos"],
+		x1=dna["projectile_end_pos"],
+		V0=dna["capacitance_voltage"],
+		v0=dna["projectile_velocity"],
+		t_max=t_max,
+		t_steps=t_steps
+	)
+
+	v0, v1 = v[0], v[-1]
+	V0, V1 = V[0], V[-1]
+
+	n = calculate_efficiency(
+		v0=v0,
+		v1=v1,
+		V0=V0,
+		V1=V1,
+		m=dna["projectile_mass"],
+		C=dna["capacitance"]
+	)
+
+	print(f"Coilgun efficiency: {n}")
+
+	fig, ((pos_ax, vel_ax), (volt_ax, current_ax)) = plt.subplots(2,2)
+
+	pos_ax.plot(t, x*1e3)
+	pos_ax.set(ylabel="Position [mm]")
+	vel_ax.plot(t, v)
+	vel_ax.set(ylabel="Hastighet [m/s]")
+	volt_ax.plot(t, V)
+	volt_ax.set(ylabel="Voltage i Kapacitansbank [V]")
+	current_ax.plot(t, I)
+	current_ax.set(ylabel="Ström genom spolen [A]")
+
+	plt.show()

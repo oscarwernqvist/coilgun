@@ -5,7 +5,7 @@ from datetime import datetime
 from GA.evolution import Evolution, CrossBreeding
 from GA.recorder import CheckpointRecorder
 from GA.DNA import DNA, MutationRules
-from GA.fitness import CoilFitness
+from GA.fitness import CoilFitness, ODECoilFitness
 from GA.selection import versus
 from utils.path import defaults_path, data_path
 from .load_objects import read_DNA_from_template, get_simulation_conf, parse_args
@@ -16,6 +16,12 @@ from .load_objects import read_DNA_from_template, get_simulation_conf, parse_arg
 def main():
 	parser = ArgumentParser(
 		description='Evolve a coilgun using a genetinc algorithm'
+	)
+	parser.add_argument(
+		'--ode',
+		action='store_true',
+		default=False,
+		help="Use the ODE solver"
 	)
 	# Required arguments
 	parser.add_argument(
@@ -40,7 +46,7 @@ def main():
 	)
 	parser.add_argument(
 		'-c', '--conf',
-		default=f"{defaults_path() / 'conf_template.yaml'}",
+		default=f"{defaults_path() / 'conf_ode_template.yaml'}",
 		type=str,
 		help="Template file for the simulation configuration. If not provided a default is used"
 	)
@@ -51,12 +57,19 @@ def main():
 	# Setup evoultion object
 	first_generation = [read_DNA_from_template(args["DNA"]) for _ in range(args["population_size"])]
 	mutation_rules = MutationRules.read_rules(Path(args["rules"]))
-	simulation_conf = get_simulation_conf(args)
 
 	for dna in first_generation:
 		dna.randomize_DNA(mutation_rules)
 
-	fitness_func = CoilFitness(simulation_conf=simulation_conf)
+	if args["ode"]:
+		fitness_func = ODECoilFitness(
+			max_time=args["max_time"],
+			minimum_solver_steps=args["minimum_solver_steps"]
+		)
+	else:	
+		simulation_conf = get_simulation_conf(args)
+		fitness_func = CoilFitness(simulation_conf=simulation_conf)
+	
 	breeding_protocol = CrossBreeding(parent_selection=versus)
 
 	evolution = Evolution(

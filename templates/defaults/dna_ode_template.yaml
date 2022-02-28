@@ -1,0 +1,15 @@
+# Solenoid DNA
+solenoid_length: 50.0e-3  # [m]
+solenoid_radius: 10.0e-3  # [m]
+solenoid_turns: 500       # [-]
+
+# Capacitance bank
+capacitance: 1600.0e-6      # [uF]
+capacitance_voltage: 300.0  # [V]
+
+# Projectile
+projectile_mass: 10.0e-3        # [kg]
+projectile_start_pos: -30.0e-3  # [m]
+projectile_end_pos: 0.0         # [m]
+projectile_velocity: 0.0        # [m/s]
+projectile_mu_r: 5              # [-]

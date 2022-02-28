@@ -7,6 +7,14 @@ from coilgun.power_source import ConstantCurrent, ConstantVoltage, PowerSource, 
 from coilgun.projectile import Projectile1D, MagneticProjectile, FerromageneticProjectile, ProjectileEnum
 from simulation.simulate import CoilgunSimulation, SimulationConf
 
+from ode_models.coilgun import ode_solver_coilgun, calculate_efficiency
+from ode_models.inductance_models import (
+	exponential_model_of_coil_indunctance, 
+	exponential_model_of_coil_indunctance_derivative,
+	parmas_for_exponential_model,
+	solenoid_resistance
+)
+
 def coil_from_DNA(dna: DNA) -> Coil:
 	"""Create a coil from the DNA"""
 	coil_enum = CoilEnum[dna["CoilType"]]
@@ -109,6 +117,55 @@ class CoilFitness(FitnessFunction):
 		else:
 			n = energy_gain / energy_consumed
 		return n
+
+
+class ODECoilFitness(FitnessFunction):
+	"""Calculate the fitness of a coil modeled as an ODE"""
+
+	def __init__(self, max_time: float, minimum_solver_steps: int=None):
+		self.max_time = max_time
+		self.minimum_solver_steps = minimum_solver_steps
+
+	def __call__(self, dna: DNA) -> float:
+		A, B, C, D, E = parmas_for_exponential_model(
+			mu_r=dna["projectile_mu_r"],
+			N=dna["solenoid_turns"],
+			r=dna["solenoid_radius"],
+			l=dna["solenoid_length"]
+		)
+
+		L = exponential_model_of_coil_indunctance(A, B, C, D, E)
+		dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
+		R = solenoid_resistance(
+			N=dna["solenoid_turns"],
+			r=dna["solenoid_radius"]
+		)
+
+		t, x, v, I, V = ode_solver_coilgun(
+			C=dna["capacitance"],
+			R=R,
+			m=dna["projectile_mass"],
+			L=L,
+			dLdx=dLdx,
+			x0=dna["projectile_start_pos"],
+			x1=dna["projectile_end_pos"],
+			V0=dna["capacitance_voltage"],
+			v0=dna["projectile_velocity"],
+			t_max=self.max_time,
+			t_steps=self.minimum_solver_steps
+		)
+
+		v0, v1 = v[0], v[-1]
+		V0, V1 = V[0], V[-1]
+
+		return calculate_efficiency(
+			v0=v0,
+			v1=v1,
+			V0=V0,
+			V1=V1,
+			m=dna["projectile_mass"],
+			C=dna["capacitance"]
+		)
 
 
 class NoDNAError(Exception):
