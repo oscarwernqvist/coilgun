@@ -70,4 +70,6 @@ def parmas_for_exponential_model(mu_r: float, N: int, r: float, l: float) -> tup
 	# When the projectile is at outside of the core the exponential should be ~0
 	B = (l/2)**(-D)
 
+	print(B)
+
 	return A, B, C, D, E

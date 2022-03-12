@@ -13,6 +13,7 @@ from ode_models.inductance_models import (
 	parmas_for_exponential_model,
 	solenoid_resistance
 )
+from ode_models.simulation import CoilgunSimulationODE
 
 
 def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
@@ -58,35 +59,40 @@ def draw_simulation(sim: CoilgunSimulation) -> FuncAnimation:
 	return animation
 
 def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
-	A, B, C, D, E = parmas_for_exponential_model(
-		mu_r=dna["projectile_mu_r"],
-		N=dna["solenoid_turns"],
-		r=dna["solenoid_radius"],
-		l=dna["solenoid_length"]
-	)
+	# A, B, C, D, E = parmas_for_exponential_model(
+	# 	mu_r=dna["projectile_mu_r"],
+	# 	N=dna["solenoid_turns"],
+	# 	r=dna["solenoid_radius"],
+	# 	l=dna["solenoid_length"]
+	# )
+	# L = exponential_model_of_coil_indunctance(A, B, C, D, E)
+	# dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
+	# R = solenoid_resistance(
+	# 	N=dna["solenoid_turns"],
+	# 	r=dna["solenoid_radius"],
+	# 	A=dna["wire_cross_sectional_area"],
+	# 	resistivity=dna["solenoid_resistivity"]
+	# )
 
-	L = exponential_model_of_coil_indunctance(A, B, C, D, E)
-	dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
-	R = solenoid_resistance(
-		N=dna["solenoid_turns"],
-		r=dna["solenoid_radius"],
-		A=dna["wire_cross_sectional_area"],
-		resistivity=dna["solenoid_resistivity"]
-	)
+	# print(R)
 
-	t, x, v, I, V, dIdt = ode_solver_coilgun(
-		C=dna["capacitance"],
-		R=R,
-		m=dna["projectile_mass"],
-		L=L,
-		dLdx=dLdx,
-		x0=dna["projectile_start_pos"],
-		x1=dna["projectile_end_pos"],
-		V0=dna["capacitance_voltage"],
-		v0=dna["projectile_velocity"],
-		t_max=t_max,
-		t_steps=t_steps
-	)
+	# t, x, v, I, V, dIdt = ode_solver_coilgun(
+	# 	C=dna["capacitance"],
+	# 	R=R,
+	# 	m=dna["projectile_mass"],
+	# 	L=L,
+	# 	dLdx=dLdx,
+	# 	x0=dna["projectile_start_pos"],
+	# 	x1=dna["projectile_end_pos"],
+	# 	V0=dna["capacitance_voltage"],
+	# 	v0=dna["projectile_velocity"],
+	# 	t_max=t_max,
+	# 	t_steps=t_steps
+	# )
+	sim = CoilgunSimulationODE.from_DNA(dna)
+	t, x, v, I, V = sim.run(t_max, t_steps)
+
+	dLdx = sim.coil.inductance_model_derivitive(sim.projectile)
 
 	F = I**2 * dLdx(x) / 2
 

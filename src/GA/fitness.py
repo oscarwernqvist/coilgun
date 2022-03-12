@@ -14,6 +14,7 @@ from ode_models.inductance_models import (
 	parmas_for_exponential_model,
 	solenoid_resistance
 )
+from ode_models.simulation import CoilgunSimulationODE
 
 def coil_from_DNA(dna: DNA) -> Coil:
 	"""Create a coil from the DNA"""
@@ -127,35 +128,8 @@ class ODECoilFitness(FitnessFunction):
 		self.minimum_solver_steps = minimum_solver_steps
 
 	def __call__(self, dna: DNA) -> float:
-		A, B, C, D, E = parmas_for_exponential_model(
-			mu_r=dna["projectile_mu_r"],
-			N=dna["solenoid_turns"],
-			r=dna["solenoid_radius"],
-			l=dna["solenoid_length"]
-		)
-
-		L = exponential_model_of_coil_indunctance(A, B, C, D, E)
-		dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
-		R = solenoid_resistance(
-			N=dna["solenoid_turns"],
-			r=dna["solenoid_radius"],
-			A=dna["wire_cross_sectional_area"],
-			resistivity=dna["solenoid_resistivity"]
-		)
-
-		t, x, v, I, V, _ = ode_solver_coilgun(
-			C=dna["capacitance"],
-			R=R,
-			m=dna["projectile_mass"],
-			L=L,
-			dLdx=dLdx,
-			x0=dna["projectile_start_pos"],
-			x1=dna["projectile_end_pos"],
-			V0=dna["capacitance_voltage"],
-			v0=dna["projectile_velocity"],
-			t_max=self.max_time,
-			t_steps=self.minimum_solver_steps
-		)
+		sim = CoilgunSimulationODE.from_DNA(dna)
+		t, x, v, I, V = sim.run(self.max_time, self.minimum_solver_steps)
 
 		v0, v1 = v[0], v[-1]
 		V0, V1 = V[0], V[-1]
