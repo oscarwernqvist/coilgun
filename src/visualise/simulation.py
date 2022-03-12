@@ -70,6 +70,7 @@ def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
 	R = solenoid_resistance(
 		N=dna["solenoid_turns"],
 		r=dna["solenoid_radius"],
+		A=dna["wire_cross_sectional_area"],
 		resistivity=dna["solenoid_resistivity"]
 	)
 

@@ -139,6 +139,7 @@ class ODECoilFitness(FitnessFunction):
 		R = solenoid_resistance(
 			N=dna["solenoid_turns"],
 			r=dna["solenoid_radius"],
+			A=dna["wire_cross_sectional_area"],
 			resistivity=dna["solenoid_resistivity"]
 		)
 

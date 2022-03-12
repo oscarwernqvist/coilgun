@@ -31,9 +31,19 @@ def solenoid_inductance(mu: float, N: int, r: float, l: float) -> float:
 	A = np.pi * r**2
 	return mu*(N**2)*A / l
 
-def solenoid_resistance(N: int, r: float, resistivity: float):
-	"""Return the resistance of a coil"""
-	return N*2*np.pi*r*resistivity
+def solenoid_resistance(N: int, r: float, A: float, resistivity: float):
+	"""
+	Return the resistance of a coil
+
+	N: Number of turns in a coil
+	r: radius of the coil
+	A: Cross-sectional area of the wire in the coil
+	resistivity: resistivity of the wire
+	"""
+	# Length of wire
+	L = N * 2 * np.pi * r
+	# R = rho*L/A
+	return resistivity * L / A
 
 def parmas_for_exponential_model(mu_r: float, N: int, r: float, l: float) -> tuple:
 	"""

@@ -22,43 +22,56 @@ def ode_solver_coilgun(
 
 	def dydt(t, y):
 		"""
-		Calculate the derivative of the state [x, v, I, dIdt]
+		Calculate the derivative of the state [x, v, I, dIdt, V]
 		"""
-		x, v, I, dIdt = y
+		x, v, I, dIdt, V = y
 
 		dvdt = I**2 * dLdx(x) / (2*m) #+ np.divide(L(x)*I*dIdt, v, out=np.zeros_like(v), where=v!=0)
 		dIdt2 = -I / (L(x)*C) - R*dIdt / L(x) - dIdt*dLdx(x)*v/L(x)
+		dVdt = -I/C
 
-		return [v, dvdt, dIdt, dIdt2]
+
+		return [v, dvdt, dIdt, dIdt2, dVdt]
 
 	def end_point_reached(t, y):
 		"""Stop the solver if the end point is reached"""
 		return y[0] - x1
+
+	def no_reverse_voltage(t, y):
+		"""
+		Stop the solver when the voltage over the capacitance goes under zero
+		This is because the diode that protects the circuit
+		"""
+		return y[4]
+
 	# Stop at event
 	end_point_reached.terminal = True
+	no_reverse_voltage.terminal = True
 
-	# Set the event
-	event = end_point_reached if x1 is not None else None
+	# Set the events
+	events = [no_reverse_voltage]
+	if x1 is not None:
+		events.append(end_point_reached)
 
 	# Calculate maximum time step
 	t_step = t_max / t_steps if t_steps is not None else np.inf
 
 	# Calculate initial conditions
-	y0 = [x0, v0, 0.0, V0/L(x0)]
+	y0 = [x0, v0, 0.0, V0/L(x0), V0]
 
 	sol = integrate.solve_ivp(
 		fun=dydt, 
 		y0=y0, 
 		t_span=(0, t_max), 
-		events=event,
+		events=events,
 		max_step=t_step
 	)
 
 	t = sol.t
-	x, v, I, dIdt = sol.y
+	x, v, I, dIdt, V = sol.y
 
 	# Calculate voltage over capacitance bank
-	V = V0 - 1/C*integrate.cumulative_trapezoid(I, t, initial=0)
+	#V = V0 - 1/C*integrate.cumulative_trapezoid(I, t, initial=0)
 
 	# # Power loss
 	# P_R = R*I*I
@@ -75,10 +88,69 @@ def ode_solver_coilgun(
 	# print(f"Energy lost by the inductor: {integrate.trapz(P_L, t)} J")
 	# print(f"Energy lost by the resistance and inductor: {integrate.trapz(P_R+P_L, t)} J")
 	# print(f"Final velocity: {integrate.trapz(a, t)} m/s")
-	# print(f"Work on the projectile: {integrate.trapz(F, x)} m/s")
+	# print(f"Work on the projectile: {integrate.trapz(F, x)} J")
 	# print(f"Energy gained by the projectile: {m/2*(v[-1]**2-v[0]**2)} J")
 
 	return t, x, v, I, V, dIdt
+
+def ode_solver_RL(
+	R: float, 		# Resistance of the coil
+	m: float, 		# Mass of the projectile
+	L: Callable, 	# Function that calculates the inductance of the coil at the position x
+	dLdx: Callable, # Function that calculates the derivative of the inductance at the position x
+	x0: float,		# Starting position relative to the center of the coil for the projectile
+	t_max: float,	# Maximum time for the simulation
+	v0: float, 		# Starting velocity of the projectile
+	I0: float, 		# Starting currnet through the coil
+	x1: float=None, # If present the simulation will end when the projectile passes this point
+	t_steps: int=None # Minimum steps the solver should take
+):
+	"""
+	ODE solver for a coilgun after the contact to capacitance bank is closed.
+	This method assumes that the inductance is a known function of the position
+	"""
+
+	def dydt(t, y):
+		"""
+		Calculate the derivative of the state [x, v, I]
+		"""
+		x, v, I = y
+
+		dvdt = I**2 * dLdx(x) / (2*m) #+ np.divide(L(x)*I*dIdt, v, out=np.zeros_like(v), where=v!=0)
+		dIdt = -I*R/L(x)
+
+		return [v, dvdt, dIdt]
+
+	def end_point_reached(t, y):
+		"""Stop the solver if the end point is reached"""
+		return y[0] - x1
+
+	# Stop at event
+	end_point_reached.terminal = True
+
+	# Set the events
+	events = None
+	if x1 is not None:
+		events = end_point_reached
+
+	# Calculate maximum time step
+	t_step = t_max / t_steps if t_steps is not None else np.inf
+
+	# Calculate initial conditions
+	y0 = [x0, v0, I0]
+
+	sol = integrate.solve_ivp(
+		fun=dydt, 
+		y0=y0, 
+		t_span=(0, t_max), 
+		events=events,
+		max_step=t_step
+	)
+
+	t = sol.t
+	x, v, I = sol.y
+
+	return x, v, I
 
 def calculate_efficiency(
 	v0: float,	# Starting velocity for the projectile

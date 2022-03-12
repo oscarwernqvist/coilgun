@@ -1,12 +1,12 @@
 # Solenoid rules
-solenoid_length:
-  min: 10.0e-3
-  max: 100.0e-3
-  rate: 0.01
-solenoid_radius:
-  min: 5.0e-3
-  max: 10.0e-3
-  rate: 0.01
+# solenoid_length:
+#   min: 10.0e-3
+#   max: 100.0e-3
+#   rate: 0.01
+# solenoid_radius:
+#   min: 5.0e-3
+#   max: 10.0e-3
+#   rate: 0.01
 solenoid_turns:
   min: 50
   max: 2000
@@ -31,15 +31,15 @@ projectile_start_pos:
   min: -60.0e-3
   max: 0
   rate: 0.01
-projectile_end_pos:
-  min: -40.0e-3
-  max: 0
-  rate: 0.01
-projectile_velocity:
-  min: 0
-  max: 1
-  rate: 0
-projectile_mu_r:
-  min: 1
-  max: 10
-  rate: 0
+# projectile_end_pos:
+#   min: -40.0e-3
+#   max: 0
+#   rate: 0.01
+# projectile_velocity:
+#   min: 0
+#   max: 1
+#   rate: 0
+# projectile_mu_r:
+#   min: 1
+#   max: 10
+#   rate: 0

@@ -1,8 +1,12 @@
 import os
 
+from datetime import datetime
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Callable
+from math import floor
+
+import matplotlib.pyplot as plt
 
 
 class Recorder(ABC):
@@ -39,23 +43,84 @@ class RecordFunc(Recorder):
 		self.summary_func(evolution)
 
 
-class FitnessRecorder(Recorder):
+class CLIInformationRecorder(Recorder):
+	"""Print information to the command line during evolution"""
+
+	def __init__(self, print_every: int=1):
+		self.print_every = print_every
+		self.start_time = None
+
+	def setup(self, evolution):
+		self.start_time = datetime.now()
+		print("Generation\tProgress\tAverage fitness\tBest fitness\tElapsed time (H:M:S)\tEstimated time left(H:M:S)")
+
+	def record(self, evolution):
+		gen = evolution.current_gen
+		gens = evolution.last_gen
+
+		# Generation
+		generation_report = f"{gen}/{gens}"
+
+		# Progress bar
+		progressbar_width = 20
+		fill = floor(progressbar_width * gen / gens)
+		progressbar = ('#'*fill).ljust(progressbar_width, "-")
+
+		# Fitness report
+		average_fitness = f"{evolution.average_score():.4f}"
+		best_fitness = f"{evolution.best_score:.4f}"
+
+		# Time eleapsed
+		duration = datetime.now() - self.start_time
+		total_seconds = duration.total_seconds()
+		hours, minutes_rest = divmod(total_seconds, 3600)
+		minutes, seconds_rest = divmod(minutes_rest, 60)
+		seconds = round(seconds_rest)
+
+		time_elapsed = f"{hours:.0f}:{minutes:.0f}:{seconds:.0f}"
+
+		# Time left
+		average_duration = total_seconds / gen
+		seconds_left = average_duration * (gens - gen)
+		hours, minutes_rest = divmod(seconds_left, 3600)
+		minutes, seconds_rest = divmod(minutes_rest, 60)
+		seconds = round(seconds_rest)
+
+		time_left = f"{hours:.0f}:{minutes:.0f}:{seconds:.0f}"
+
+		print("\t".join([generation_report, progressbar, average_fitness, best_fitness, time_elapsed, time_left]))
+
+	def summary(self, evolution):
+		pass
+
+
+class FitnessRecorder(CLIInformationRecorder):
 	"""Record statistics about the evolution"""
 
 	def __init__(self):
 		self.data = []
 
 	def setup(self, evolution):
-		pass
+		super().setup(evolution)
 
 	def record(self, evolution):
+		super().record(evolution)
+
 		average_score = evolution.average_score()
 		best_score = evolution.best_score
 		self.data.append((average_score, best_score))
 
 	def summary(self, evolution):
-		# TODO: Matlab plot
-		print(self.data)
+		# TODO: Matlab plot and save data
+		super().summary(evolution)
+
+		plt.plot(range(1, evolution.last_gen+1), self.data, label=["Average fitness", "Best fitness"])
+
+		plt.ylim([0, max(1, evolution.best_score*1.2)])
+		plt.xlabel("Generation")
+		plt.ylabel("Efficiency")
+		plt.legend()
+		plt.show()
 
 
 class CheckpointRecorder(FitnessRecorder):
