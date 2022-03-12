@@ -138,10 +138,11 @@ class ODECoilFitness(FitnessFunction):
 		dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
 		R = solenoid_resistance(
 			N=dna["solenoid_turns"],
-			r=dna["solenoid_radius"]
+			r=dna["solenoid_radius"],
+			resistivity=dna["solenoid_resistivity"]
 		)
 
-		t, x, v, I, V = ode_solver_coilgun(
+		t, x, v, I, V, _ = ode_solver_coilgun(
 			C=dna["capacitance"],
 			R=R,
 			m=dna["projectile_mass"],

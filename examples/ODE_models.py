@@ -29,7 +29,7 @@ m = 8e-3
 V0 = 300
 x0 = -50e-3
 
-t, x, v, I, V = ode_solver_coilgun(
+t, x, v, I, V, _ = ode_solver_coilgun(
 	C=C,
 	R=R,
 	m=m,

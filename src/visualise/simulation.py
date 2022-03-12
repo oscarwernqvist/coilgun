@@ -69,10 +69,11 @@ def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
 	dLdx = exponential_model_of_coil_indunctance_derivative(A, B, C, D)
 	R = solenoid_resistance(
 		N=dna["solenoid_turns"],
-		r=dna["solenoid_radius"]
+		r=dna["solenoid_radius"],
+		resistivity=dna["solenoid_resistivity"]
 	)
 
-	t, x, v, I, V = ode_solver_coilgun(
+	t, x, v, I, V, dIdt = ode_solver_coilgun(
 		C=dna["capacitance"],
 		R=R,
 		m=dna["projectile_mass"],
@@ -85,6 +86,8 @@ def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
 		t_max=t_max,
 		t_steps=t_steps
 	)
+
+	F = I**2 * dLdx(x) / 2
 
 	v0, v1 = v[0], v[-1]
 	V0, V1 = V[0], V[-1]
@@ -100,7 +103,7 @@ def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
 
 	print(f"Coilgun efficiency: {n}")
 
-	fig, ((pos_ax, vel_ax), (volt_ax, current_ax)) = plt.subplots(2,2)
+	fig, ((pos_ax, vel_ax), (volt_ax, current_ax), (force_ax, empty_ax)) = plt.subplots(3,2)
 
 	pos_ax.plot(t, x*1e3)
 	pos_ax.set(ylabel="Position [mm]")
@@ -110,5 +113,8 @@ def plot_ode_solution(dna: DNA, t_max: float, t_steps: int):
 	volt_ax.set(ylabel="Voltage i Kapacitansbank [V]")
 	current_ax.plot(t, I)
 	current_ax.set(ylabel="Ström genom spolen [A]")
+	force_ax.plot(x*1e3, F)
+	force_ax.set(ylabel="Kraft på projektilen [N]")
+	force_ax.set(xlabel="Projektilens position [mm]")
 
 	plt.show()

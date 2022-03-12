@@ -26,7 +26,7 @@ def ode_solver_coilgun(
 		"""
 		x, v, I, dIdt = y
 
-		dvdt = I**2 * dLdx(x) / (2*m)
+		dvdt = I**2 * dLdx(x) / (2*m) #+ np.divide(L(x)*I*dIdt, v, out=np.zeros_like(v), where=v!=0)
 		dIdt2 = -I / (L(x)*C) - R*dIdt / L(x) - dIdt*dLdx(x)*v/L(x)
 
 		return [v, dvdt, dIdt, dIdt2]
@@ -58,10 +58,27 @@ def ode_solver_coilgun(
 	x, v, I, dIdt = sol.y
 
 	# Calculate voltage over capacitance bank
-	#V = L(x)*dIdt + R*I
 	V = V0 - 1/C*integrate.cumulative_trapezoid(I, t, initial=0)
 
-	return t, x, v, I, V
+	# # Power loss
+	# P_R = R*I*I
+	# P_C = V*I
+	# P_L = L(x)*dIdt*I
+
+	# # Force
+	# F = I**2 * dLdx(x) / 2
+	# a = F / m
+
+	# # Print enery loss by the circuit
+	# print(f"Energy lost by the capacitator: {integrate.trapz(P_C, t)} J")
+	# print(f"Energy lost by the resistance: {integrate.trapz(P_R, t)} J")
+	# print(f"Energy lost by the inductor: {integrate.trapz(P_L, t)} J")
+	# print(f"Energy lost by the resistance and inductor: {integrate.trapz(P_R+P_L, t)} J")
+	# print(f"Final velocity: {integrate.trapz(a, t)} m/s")
+	# print(f"Work on the projectile: {integrate.trapz(F, x)} m/s")
+	# print(f"Energy gained by the projectile: {m/2*(v[-1]**2-v[0]**2)} J")
+
+	return t, x, v, I, V, dIdt
 
 def calculate_efficiency(
 	v0: float,	# Starting velocity for the projectile

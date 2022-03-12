@@ -13,7 +13,8 @@ from .load_objects import read_DNA_from_template, get_simulation_conf, parse_arg
 
 # TODO: Add command line args for settings
 
-def main():
+def evolution_parser():
+	"""Return a parser for the evolution program"""
 	parser = ArgumentParser(
 		description='Evolve a coilgun using a genetinc algorithm'
 	)
@@ -50,9 +51,10 @@ def main():
 		type=str,
 		help="Template file for the simulation configuration. If not provided a default is used"
 	)
+	return parser
 
-	# Parse arguments and execute the program
-	args = parse_args(parser.parse_args())
+def evolution(args: dict):
+	"""Evolve"""
 
 	# Setup evoultion object
 	first_generation = [read_DNA_from_template(args["DNA"]) for _ in range(args["population_size"])]
@@ -86,6 +88,14 @@ def main():
 
 	# Evolve
 	evolution.evolve(recorder=recorder)
+
+def main():
+	parser = evolution_parser()
+
+	# Parse arguments and execute the program
+	args = parse_args(parser.parse_args())
+
+	evolution(args)
 
 
 if __name__ == '__main__':
