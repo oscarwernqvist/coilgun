@@ -8,12 +8,6 @@ from coilgun.projectile import Projectile1D, MagneticProjectile, FerromageneticP
 from simulation.simulate import CoilgunSimulation, SimulationConf
 
 from ode_models.coilgun import ode_solver_coilgun, calculate_efficiency
-from ode_models.inductance_models import (
-	exponential_model_of_coil_indunctance, 
-	exponential_model_of_coil_indunctance_derivative,
-	parmas_for_exponential_model,
-	solenoid_resistance
-)
 from ode_models.simulation import CoilgunSimulationODE
 
 def coil_from_DNA(dna: DNA) -> Coil:

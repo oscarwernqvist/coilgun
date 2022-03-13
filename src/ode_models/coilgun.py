@@ -94,7 +94,7 @@ def ode_solver_coilgun(
 	return t, x, v, I, V, dIdt
 
 def ode_solver_RL(
-	RL: float, 		# Resistance of the coil
+	R: float, 		# Resistance of the coil
 	m: float, 		# Mass of the projectile
 	L: Callable, 	# Function that calculates the inductance of the coil at the position x
 	dLdx: Callable, # Function that calculates the derivative of the inductance at the position x
@@ -109,9 +109,6 @@ def ode_solver_RL(
 	ODE solver for a coilgun after the contact to capacitance bank is closed.
 	This method assumes that the inductance is a known function of the position
 	"""
-	# Todo: Add extra resistanse to drag current to zero faster
-	R_tot = RL
-
 	def dydt(t, y):
 		"""
 		Calculate the derivative of the state [x, v, I]
@@ -119,7 +116,7 @@ def ode_solver_RL(
 		x, v, I = y
 
 		dvdt = I**2 * dLdx(x) / (2*m) #+ np.divide(L(x)*I*dIdt, v, out=np.zeros_like(v), where=v!=0)
-		dIdt = -I*R_tot/L(x)
+		dIdt = -I*R/L(x)
 
 		return [v, dvdt, dIdt]
 

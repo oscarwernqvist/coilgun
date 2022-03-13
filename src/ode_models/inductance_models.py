@@ -1,75 +1,89 @@
 import numpy as np
+from scipy.optimize import curve_fit
+from scipy.stats import linregress
 
-from utils.constants import mu_0
+import matplotlib.pyplot as plt
 
 
-def exponential_model_of_coil_indunctance(A: float, B: float, C: float, D: float, E: float):
-	"""Create a function to calculate the inductance of a coil"""
-	def L(x):
-		"""
-		Calculate the inductance of a coil
-		L(x) = Ae^(-B|x-C|^D) + E
-		"""
-		return A*np.exp(-B*np.power(np.abs(x-C), D)) + E
+"""
+Fit data of the inductance in a coil to the function
+L(x) = A*exp(-B|x|^C) + D
+"""
 
-	return L
+def L(x, A, B, C, D):
+	return A*np.exp(-B*np.power(np.abs(x), C)) + D
 
-def exponential_model_of_coil_indunctance_derivative(A: float, B: float, C: float, D: float):
-	"""Create a function to calculate the derivative of the inductance of a coil"""
-	def dLdx(x):
-		"""
-		Calculate the derivative of the inductance of a coil
-		L'(x) = -ABDe^(-B|x-C|^D)|x-C|^D/(x-C)
-		"""
-		xc = x - C
-		return -A*B*D*np.exp(-B*np.power(np.abs(xc), D))*np.power(np.abs(xc), D-2)*xc
+def plot_relation(x, y, ax1, ax2):
+	"""Find and plot the relation between x and y"""
+	logx = np.log(x)
+	logy = np.log(y)
 
-	return dLdx
+	res = linregress(logx, logy)
 
-def solenoid_inductance(mu: float, N: int, r: float, l: float) -> float:
-	"""Return the inductance of a coil with a core with permeability mu"""
-	A = np.pi * r**2
-	return mu*(N**2)*A / l
+	ax1.scatter(logx, logy, marker="o", c="b", label="Original data")
+	ax1.plot(logx, res.intercept + res.slope*logx, 'r', label=f"Fitted line with a slope {res.slope:.4f}")
+	ax1.legend()
 
-def solenoid_resistance(N: int, r: float, A: float, resistivity: float):
-	"""
-	Return the resistance of a coil
+	ax2.scatter(x, y, marker="o", c="b", label="Original data")
+	ax2.plot(x, x**res.slope, 'r', label=f"Fitted line with an exponent {res.slope:.4f}")
+	ax2.legend()
 
-	N: Number of turns in a coil
-	r: radius of the coil
-	A: Cross-sectional area of the wire in the coil
-	resistivity: resistivity of the wire
-	"""
-	# Length of wire
-	L = N * 2 * np.pi * r
-	# R = rho*L/A
-	return resistivity * L / A
 
-def parmas_for_exponential_model(mu_r: float, N: int, r: float, l: float) -> tuple:
-	"""
-	Calculate parmas A, B, C, D and E for the 
-	exponential model of the inductance in a coil
-	
-	mu_r: Relative permeability of the projectile
-	N: Number of turns of wire in the coil
-	r: radius of the coil
-	l: length of the coil
-	"""
-	# E is the inductance in the absence of a projectile in the core
-	E = solenoid_inductance(mu_0, N, r, l)
+data_file = None
 
-	# A is the increase of inductance when the projectile is in the center of the coil
-	A = E*mu_r - E
+if data_file is None:
+	xdata = []
+	ydata = []
+	Ns = np.arange(5) + 1 
+	for N in Ns:
 
-	# C is 0 if the coil is centered around 0
-	C = 0
+		x = np.linspace(-5, 5, 100)
 
-	# D was 2.06 for the other studie so I use it here for now
-	D = 2.06
+		y0 = L(x, 5*N**2, 2, 2, N)
 
-	# When the projectile is at outside of the core the exponential should be ~0
-	B = (l/2)**(-D)
+		rng = np.random.default_rng()
+		y_noise = 0.2 * rng.normal(size=x.size)
 
-	print(B)
+		y = y0 + y_noise
 
-	return A, B, C, D, E
+		xdata.append(x)
+		ydata.append(y)
+
+else: 
+	pass # Read data from file
+
+
+# Fit A, B, C, D to the data
+ABCDs = []
+for x, y in zip(xdata, ydata):
+	ABCD, _ = curve_fit(L, x, y)
+	ABCDs.append(ABCD)
+ABCDs = np.array(ABCDs)
+
+fig1, ((ax_A1, ax_B1), (ax_C1, ax_D1)) = plt.subplots(2, 2)
+fig2, ((ax_A2, ax_B2), (ax_C2, ax_D2)) = plt.subplots(2, 2)
+
+# Find relation to A
+# ax_A1.scatter(np.log(Ns), np.log(ABCDs[:,0]))
+
+# ax_A2.scatter(Ns, ABCDs[:,0])
+# ax_A2.set_ylim(bottom=0)
+plot_relation(Ns, ABCDs[:,0]-Ns**2, ax_A1, ax_A2)
+plot_relation(Ns, ABCDs[:,1], ax_B1, ax_B2)
+plot_relation(Ns, ABCDs[:,2], ax_C1, ax_C2)
+plot_relation(Ns, ABCDs[:,3], ax_D1, ax_D2)
+
+plt.show()
+
+# plt.scatter(xdata, ydata, marker='*', c='b', label='data')
+# plt.plot(
+# 	xdata, 
+# 	L(xdata, *popt), 
+# 	'r-',
+# 	label='fit: A=%5.3f, B=%5.3f, C=%5.3f, D=%5.3f' % tuple(popt)
+# )
+# plt.xlabel('x')
+# plt.ylabel('y')
+# plt.legend()
+# plt.show()
+
